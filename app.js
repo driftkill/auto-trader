@@ -1,10 +1,9 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-require('dotenv').config()
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+require("dotenv").config();
 
 const app = express();
-const port = 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -13,25 +12,28 @@ app.use(bodyParser.json());
 mongoose.connect(process.env.mongourl, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+    console.log("Connected to MongoDB");
 });
 
 // Define Schema and Model
-const dataSchema = new mongoose.Schema({
-    text: String
-});
+const dataSchema = new mongoose.Schema(
+    {
+        text: String,
+    },
+    { timestamps: true }
+);
 
-const Data = mongoose.model('Data', dataSchema);
+const Data = mongoose.model("Data", dataSchema);
 
 // Health Check API
-app.get('/health', (req, res) => {
-    res.status(200).send('Server is healthy');
+app.get("/health", (req, res) => {
+    res.status(200).send("Server is healthy");
 });
 
 // Post Data API
-app.post('/data', async (req, res) => {
+app.post("/data", async (req, res) => {
     try {
         const newData = new Data({ text: req.body.text });
         await newData.save();
@@ -42,7 +44,7 @@ app.post('/data', async (req, res) => {
 });
 
 // Get Data API
-app.get('/data', async (req, res) => {
+app.get("/data", async (req, res) => {
     try {
         const data = await Data.find();
         res.status(200).send(data);
